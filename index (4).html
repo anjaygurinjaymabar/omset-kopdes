@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#C71E1E">
+<title>Dashboard Omset — Kopdes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--merah:#C71E1E;--merah-tua:#9e1515;--abu:#5b5b5b;--garis:#ececec;--bg:#faf9f9;--hijau:#0a7d3a;--biru:#1a56db;--oranye:#b26a00;--merah-muda:#fdecec}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#1c1c1c;font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;padding-bottom:40px}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1500px;margin:auto;padding:24px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--merah);color:#fff;font-size:24px;font-weight:900;box-shadow:0 4px 14px #c71e1e33;font-family:'Plus Jakarta Sans',sans-serif}
+.brand h1{font-size:21px;margin:0 0 4px;letter-spacing:-.5px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:#1c1c1c}
+.brand p{margin:0;color:#888;font-size:12px;font-weight:600}
+.badge{border:1px solid #e8b4b4;color:var(--merah);background:#fdf3f3;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:800;letter-spacing:.5px;white-space:nowrap}
+.notice{background:#fdf3f3;border:1px solid #f0c9c9;color:#8a2424;border-radius:14px;padding:12px 15px;margin-bottom:18px;line-height:1.5;font-size:13px}
+.notice strong{color:var(--merah)}
+.fresh{background:#fff;border:1px solid var(--garis);border-radius:12px;padding:10px 14px;font-size:12px;color:#777;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.fresh b{color:var(--merah)}
+.toolbar,.panel,.stat{background:#fff;border:1px solid var(--garis);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.toolbar{padding:16px;margin-bottom:20px}
+.filters{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:12px}
+.field label{display:block;font-size:11px;color:var(--abu);margin:0 0 7px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.field input,.field select{width:100%;min-width:0;background:#fafafa;color:#1c1c1c;border:1px solid #ddd;border-radius:10px;padding:11px 12px;outline:none;font-size:13px}
+.field input:focus,.field select:focus{border-color:var(--merah);box-shadow:0 0 0 3px #c71e1e1c}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.btn{border:1px solid #ddd;color:#444;background:#fff;border-radius:10px;padding:10px 13px;font-weight:700;font-size:12px}
+.btn:hover{filter:brightness(.97);border-color:#ccc}
+.btn.primary{background:var(--merah);border-color:var(--merah);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.stat{padding:18px;position:relative;overflow:hidden}
+.stat:after{content:"";position:absolute;width:95px;height:95px;border-radius:50%;right:-35px;top:-42px;background:var(--accent,var(--merah));opacity:.07}
+.stat .label{font-size:12px;color:var(--abu);font-weight:700}
+.stat .value{font-size:clamp(20px,2.1vw,28px);font-weight:800;letter-spacing:-.8px;margin:12px 0 8px;overflow-wrap:anywhere;font-family:'Plus Jakarta Sans',sans-serif}
+.stat .foot{font-size:11px;color:#999}
+.green{color:var(--hijau)}.blue{color:var(--biru)}.orange{color:var(--oranye)}.red{color:var(--merah)}
+.nav{display:flex;gap:8px;border-bottom:1px solid var(--garis);margin-bottom:16px;overflow:auto}
+.tab{border:0;background:transparent;color:#888;padding:12px 15px;border-bottom:2px solid transparent;white-space:nowrap;font-weight:800;font-size:13px}
+.tab.active{color:var(--merah);border-color:var(--merah)}
+.layout{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-bottom:16px}
+.panel{padding:18px;min-width:0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}
+.panel h2{font-size:15px;margin:0;letter-spacing:-.2px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800}
+.sub{font-size:11px;color:#999;margin-top:5px}
+.pill{font-size:10px;border-radius:999px;padding:5px 8px;background:#fdecec;color:var(--merah);white-space:nowrap;font-weight:700}
+.table-wrap{overflow:auto;width:100%}table{border-collapse:collapse;width:100%;white-space:nowrap}
+th{text-align:left;color:var(--abu);font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:800;padding:11px 12px;border-bottom:1px solid var(--garis)}
+td{padding:12px;border-bottom:1px solid #f4f4f4;font-size:12px}
+tbody tr:hover{background:#fdf8f8}tbody tr:last-child td{border-bottom:0}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.store-name{font-weight:700}
+.status{display:inline-block;padding:5px 8px;border-radius:7px;font-size:10px;font-weight:800}
+.status.close{background:#fdecec;color:var(--merah)}
+.status.setor{background:#e6f6ec;color:var(--hijau)}
+.status.other{background:#fff3e0;color:var(--oranye)}
+.link{color:var(--merah);text-decoration:none;font-weight:700}.link:hover{text-decoration:underline}
+.barlist{display:flex;flex-direction:column;gap:13px}
+.barrow .barlabel{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px;font-size:12px;font-weight:600}
+.barlabel span:first-child{max-width:68%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barlabel strong{font-variant-numeric:tabular-nums}
+.track{height:7px;background:#f0f0f0;border-radius:99px;overflow:hidden}
+.fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--merah),#e05a5a)}
+.empty{padding:28px;text-align:center;color:#aaa}
+.section-hidden{display:none!important}
+.footer{text-align:center;color:#bbb;font-size:11px;padding:22px 0 8px}
+.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mini{background:#fafafa;border:1px solid var(--garis);border-radius:13px;padding:14px}
+.mini .m-label{font-size:11px;color:#999}
+.mini .m-val{font-size:20px;font-weight:800;margin-top:8px;font-family:'Plus Jakarta Sans',sans-serif}
+.report-note{color:#888;font-size:12px;line-height:1.55;margin:0 0 14px}
+/* head merah */
+.headbar{background:linear-gradient(135deg,var(--merah),var(--merah-tua));color:#fff;padding:22px 18px 18px;border-radius:0 0 18px 18px}
+.headbar h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;letter-spacing:.2px;margin:0}
+.headbar p{font-size:13px;opacity:.93;margin-top:4px}
+.lock{max-width:380px;margin:80px auto;text-align:center;padding:0 18px}
+.lock .kotak{background:#fff;border:1px solid var(--garis);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:28px 22px}
+.lock h2{font-size:19px;margin:10px 0 4px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800}
+.lock p{color:#999;font-size:12.5px;margin-bottom:18px}
+.lock input{width:100%;padding:14px;font-size:24px;text-align:center;letter-spacing:9px;background:#fafafa;color:#1c1c1c;border:1px solid #ddd;border-radius:12px;outline:none;font-weight:800}
+.lock input:focus{border-color:var(--merah)}
+.lock button{margin-top:14px;width:100%;padding:14px;background:var(--merah);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
+.lock #peringatan{color:var(--merah);font-size:12.5px;margin-top:10px;min-height:16px}
+@media(max-width:900px){.filters{grid-template-columns:repeat(3,minmax(0,1fr))}.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.app{padding:14px}.top{align-items:flex-start;flex-direction:column}.brand h1{font-size:18px}.logo{width:40px;height:40px}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.filters .field:last-child{grid-column:1/-1}.stat{padding:14px}.stat .value{font-size:20px}.panel{padding:13px}.panel-head{align-items:flex-start}.actions .btn{flex:1}.mini-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="lock" id="lock">
+  <div style="font-size:44px">🔒</div>
+  <h2>Dashboard Omset Kopdes</h2>
+  <p>Khusus pemilik. Masukkan PIN untuk membuka.</p>
+  <div class="kotak">
+    <input type="password" id="pin" inputmode="numeric" maxlength="6" placeholder="••••••">
+    <button id="btnBuka">Buka</button>
+    <div id="peringatan"></div>
+  </div>
+  <div style="color:#bbb;font-size:11px;margin-top:14px">PIN bisa diganti di kode (var PIN)</div>
+</div>
+
+<div class="app" id="app" style="display:none">
+<header class="headbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="logo">K</div>
+    <div><h1>Dashboard Omset</h1><p>Rekap Close Shift &amp; Setor Omset semua toko</p></div>
+  </div>
+</header>
+<div class="top" style="margin-bottom:14px;justify-content:flex-end"><span class="badge">DATA LANGSUNG DARI SISTEM</span></div>
+<div class="notice"><strong>Data langsung:</strong> diambil dari sistem rekap. Otomatis diperbarui tiap 2 menit & setiap halaman dibuka — tombol <strong>Muat ulang</strong> untuk ambil sekarang juga.</div>
+<div class="fresh"><span>🕐 <b id="freshInfo">Belum dimuat…</b></span><span style="flex:1"></span><button class="btn primary" id="btnFresh">⟳ Muat ulang data</button></div>
+<section class="toolbar"><div class="filters">
+<div class="field"><label for="from">Dari tanggal</label><input id="from" autocomplete="off" type="date"></div>
+<div class="field"><label for="to">Sampai tanggal</label><input id="to" autocomplete="off" type="date"></div>
+<div class="field"><label for="store">Pilih toko</label><select id="store" autocomplete="off"><option value="">Semua toko</option></select></div>
+<div class="field"><label for="status">Jenis transaksi</label><select id="status" autocomplete="off"><option value="">Semua jenis</option><option value="close">Close Shift</option><option value="setor">Setor Omset</option><option value="other">Lainnya</option></select></div>
+<div class="field"><label for="search">Cari transaksi / toko</label><input id="search" autocomplete="off" type="search" placeholder="Ketik nama toko..."></div>
+</div><div class="actions"><button class="btn primary" id="apply">Terapkan filter</button><button class="btn" id="reset">Reset filter</button><button class="btn" id="exportTransactions">Ekspor transaksi CSV</button><button class="btn" id="exportStores">Ekspor rekap toko CSV</button></div></section>
+<section class="stats">
+<div class="stat" style="--accent:#C71E1E"><div class="label">Total Setor Omset</div><div class="value green" id="sumSetor">—</div><div class="foot" id="countSetor">Nilai dari data terfilter</div></div>
+<div class="stat" style="--accent:#1a56db"><div class="label">Total Close Shift</div><div class="value blue" id="sumClose">—</div><div class="foot" id="countClose">Nilai dari data terfilter</div></div>
+<div class="stat" style="--accent:#b26a00"><div class="label">Selisih nominal</div><div class="value orange" id="sumDiff">—</div><div class="foot">Close Shift dikurangi Setor Omset</div></div>
+<div class="stat" style="--accent:#C71E1E"><div class="label">Jumlah catatan</div><div class="value" id="countAll">—</div><div class="foot" id="rangeLabel">Semua tanggal yang tersedia</div></div>
+</section>
+<nav class="nav"><button class="tab active" data-tab="overview">Ringkasan</button><button class="tab" data-tab="transactions">Transaksi</button><button class="tab" data-tab="reports">Laporan periode</button></nav>
+<section id="overview" class="tab-content">
+<div class="layout"><div class="panel"><div class="panel-head"><div><h2>Rekap per toko</h2><div class="sub">Perbandingan nominal berdasarkan filter aktif</div></div><span class="pill" id="storeCount">0 toko</span></div><div class="table-wrap"><table><thead><tr><th>Nama toko</th><th class="num">Close Shift</th><th class="num">Setor Omset</th><th class="num">Selisih</th></tr></thead><tbody id="storeRows"></tbody></table></div></div>
+<div class="panel"><div class="panel-head"><div><h2>Setor omset tertinggi</h2><div class="sub">Berdasarkan toko dalam periode terpilih</div></div></div><div id="topStores" class="barlist"></div></div></div>
+<div class="panel"><div class="panel-head"><div><h2>Transaksi terbaru</h2><div class="sub">Urutan tanggal terbaru dalam data yang tersedia</div></div><button class="btn" data-goto="transactions">Lihat semua</button></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Nama toko</th><th>Jenis</th><th class="num">Nominal</th><th>Bukti</th></tr></thead><tbody id="recentRows"></tbody></table></div></div>
+</section>
+<section id="transactions" class="tab-content section-hidden"><div class="panel"><div class="panel-head"><div><h2>Semua transaksi</h2><div class="sub" id="transactionCaption">Catatan sesuai filter aktif</div></div><span class="pill" id="transactionCount">0 catatan</span></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Nama toko</th><th>Jenis</th><th class="num">Nominal</th><th>Bukti</th></tr></thead><tbody id="transactionRows"></tbody></table></div><div id="transactionEmpty" class="empty section-hidden">Tidak ada transaksi untuk filter ini.</div></div></section>
+<section id="reports" class="tab-content section-hidden"><div class="layout"><div class="panel"><div class="panel-head"><div><h2>Ringkasan periode bulanan</h2><div class="sub">Bulan diturunkan dari tanggal transaksi</div></div></div><div class="table-wrap"><table><thead><tr><th>Bulan</th><th class="num">Close Shift</th><th class="num">Setor Omset</th><th class="num">Selisih</th><th class="num">Catatan</th></tr></thead><tbody id="monthRows"></tbody></table></div></div><div class="panel"><div class="panel-head"><div><h2>Ikhtisar filter aktif</h2><div class="sub">Untuk memeriksa cakupan laporan</div></div></div><div class="mini-grid"><div class="mini"><div class="m-label">Toko dengan transaksi</div><div class="m-val" id="reportStores">0</div></div><div class="mini"><div class="m-label">Hari tercatat</div><div class="m-val" id="reportDays">0</div></div><div class="mini"><div class="m-label">Setor Omset</div><div class="m-val green" id="reportSetor">Rp0</div></div><div class="mini"><div class="m-label">Close Shift</div><div class="m-val blue" id="reportClose">Rp0</div></div></div><p class="report-note" style="margin-top:14px">Catatan: Close Shift dan Setor Omset ditampilkan terpisah. Selisih aritmetis tidak otomatis berarti kekurangan setoran; pastikan kedua status memang mewakili periode dan transaksi yang bisa dibandingkan.</p><button class="btn primary" id="exportMonths">Ekspor laporan bulanan CSV</button></div></div>
+<div class="panel"><div class="panel-head"><div><h2>Ringkasan harian</h2><div class="sub">Akumulasi per tanggal dari transaksi terfilter</div></div></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th class="num">Close Shift</th><th class="num">Setor Omset</th><th class="num">Selisih</th><th class="num">Catatan</th></tr></thead><tbody id="dayRows"></tbody></table></div></div></section>
+<footer class="footer">Data dari sistem rekap · update otomatis tiap 2 menit · baca saja, tidak mengubah data</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+// ====== KONFIGURASI ======
+// Endpoint Google Apps Script (sama dengan repo DPules/RekapBandung, script.js -> API_URL).
+// GET  -> { rows:[{date:'YYYY-MM-DD', kdkmp, status:'Close Shift'|'Setor Omset', nominal, bukti}],
+//           kdkmpList:[...], operationalKdkmp:[...], totalKdkmp:Number }
+// POST -> { tanggal, kdkmp, status, nominal, fileData, fileName }  (dipakai input.html RekapBandung)
+var API = 'https://script.google.com/macros/s/AKfycbytQnTdl9gEqBUX3dfXdwZoEoES54ntEYIrYQP4s1I9RHYjcmkse9IzUKRj-zW_kBRd1Q/exec';
+var PIN = '7788'; // <- ganti PIN di sini
+var CACHE_KEY = 'omsetCache_v1';
+var CACHE_MIN = 30;   // cache hanya untuk tampil cepat; data baru tetap diambil tiap buka
+var AUTO_REFRESH_MIN = 2; // muat ulang otomatis tiap 2 menit selama halaman dibuka
+var DATA = null;
+var rows = [];
+
+var $=function(id){return document.getElementById(id);};
+var fmt=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0);
+var fmtNum=n=>new Intl.NumberFormat('id-ID',{maximumFractionDigits:0}).format(Number(n)||0);
+var fmtDate=s=>{if(!s)return '—';let d=new Date(s+'T00:00:00');return Number.isNaN(+d)?s:d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})};
+var norm=s=>String(s||'').toLowerCase();
+function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function typeOf(r){var s=norm(r.status).trim();if(s.includes('setor'))return 'setor';if(s.includes('close'))return 'close';return 'other'}
+function typeLabel(r){let t=typeOf(r);return t==='close'?'Close Shift':t==='setor'?'Setor Omset':(r.status||'Lainnya')}
+function sel(d){return (d<0?'−':'')+fmt(Math.abs(d))}
+function sum(list,t){return list.filter(r=>typeOf(r)===t).reduce((a,r)=>a+(Number(r.nominal)||0),0)}
+function aggregate(list,key){let m=new Map();for(const r of list){let k=key(r);if(!m.has(k))m.set(k,[]);m.get(k).push(r)}return m}
+function storeDisplay(s){return String(s||'—').replace(/_/g,' · ')}
+function getFiltered(){let from=$('from').value,to=$('to').value,store=$('store').value,status=$('status').value,q=norm($('search').value).trim();return rows.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)&&(!store||r.kdkmp===store)&&(!status||typeOf(r)===status)&&(!q||norm(r.kdkmp).includes(q)||norm(r.status).includes(q)||norm(r.date).includes(q)||String(r.nominal).includes(q)))}
+function tableRow(r){let t=typeOf(r),b=r.bukti?`<a class="link" href="${safe(r.bukti)}" target="_blank" rel="noopener noreferrer">Buka bukti ↗</a>`:'—';return `<tr><td>${fmtDate(r.date)}</td><td class="store-name">${safe(storeDisplay(r.kdkmp))}</td><td><span class="status ${t}">${safe(typeLabel(r))}</span></td><td class="num">${fmt(r.nominal)}</td><td>${b}</td></tr>`}
+function freshInfoTeks(){
+  if(!DATA || !DATA._ts){ $('freshInfo').textContent = 'Belum dimuat'; return; }
+  var menit = Math.round((Date.now() - DATA._ts)/60000);
+  var jam = new Date(DATA._ts);
+  var label = jam.toLocaleDateString('id-ID',{day:'2-digit',month:'short'}) + ' ' + jam.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  $('freshInfo').textContent = 'Data dimuat ' + label + ' (' + menit + ' menit lalu)';
+}
+function update(){
+  if(!DATA){ return; }
+  const f=getFiltered();const close=sum(f,'close'),setor=sum(f,'setor'),diff=close-setor;
+  $('sumSetor').textContent=fmt(setor);$('sumClose').textContent=fmt(close);$('sumDiff').textContent=(diff<0?'−':'')+fmt(Math.abs(diff));$('sumDiff').className='value '+(diff===0?'green':diff>0?'orange':'red');$('countAll').textContent=fmtNum(f.length);
+  $('countSetor').textContent=`${fmtNum(f.filter(r=>typeOf(r)==='setor').length)} catatan setor`;
+  $('countClose').textContent=`${fmtNum(f.filter(r=>typeOf(r)==='close').length)} catatan close shift`;
+  let ds=f.map(r=>r.date).filter(Boolean).sort();$('rangeLabel').textContent=ds.length?`${fmtDate(ds[0])} – ${fmtDate(ds[ds.length-1])}`:'Tidak ada tanggal';
+  let sm=aggregate(f,r=>r.kdkmp||'Tanpa nama');let srows=[...sm.entries()].map(([name,a])=>({name,a,c:sum(a,'close'),s:sum(a,'setor')})).sort((a,b)=>b.s-a.s);
+  $('storeCount').textContent=`${srows.length} toko`;
+  $('storeRows').innerHTML=srows.length?srows.map(x=>`<tr><td class="store-name">${safe(storeDisplay(x.name))}</td><td class="num">${fmt(x.c)}</td><td class="num green">${fmt(x.s)}</td><td class="num ${x.c-x.s===0?'':x.c-x.s>0?'orange':'red'}">${(x.c-x.s<0?'−':'')+fmt(Math.abs(x.c-x.s))}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">Tidak ada data</td></tr>';
+  const top=srows.filter(x=>x.s>0).slice(0,7),max=Math.max(1,...top.map(x=>x.s));
+  $('topStores').innerHTML=top.length?top.map(x=>`<div class="barrow"><div class="barlabel"><span>${safe(storeDisplay(x.name))}</span><strong>${fmt(x.s)}</strong></div><div class="track"><div class="fill" style="width:${Math.max(2,x.s/max*100)}%"></div></div></div>`).join(''):'<div class="empty">Belum ada nominal setor pada filter ini.</div>';
+  const latest=[...f].sort((a,b)=>String(b.date).localeCompare(String(a.date))||b._i-a._i).slice(0,8);$('recentRows').innerHTML=latest.length?latest.map(tableRow).join(''):'<tr><td colspan="5" class="empty">Tidak ada data</td></tr>';
+  const ordered=[...f].sort((a,b)=>String(b.date).localeCompare(String(a.date))||b._i-a._i);$('transactionRows').innerHTML=ordered.map(tableRow).join('');$('transactionCount').textContent=`${fmtNum(f.length)} catatan`;$('transactionCaption').textContent=`Menampilkan ${fmtNum(f.length)} transaksi sesuai filter aktif`;$('transactionEmpty').classList.toggle('section-hidden',f.length!==0);
+  const mm=aggregate(f,r=>(r.date||'Tanpa tanggal').slice(0,7));
+  $('monthRows').innerHTML=[...mm.entries()].sort((a,b)=>b[0].localeCompare(a[0])).map(([k,a])=>`<tr><td>${safe(k)}</td><td class="num">${fmt(sum(a,'close'))}</td><td class="num green">${fmt(sum(a,'setor'))}</td><td class="num">${sel(sum(a,'close')-sum(a,'setor'))}</td><td class="num">${fmtNum(a.length)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Tidak ada data</td></tr>';
+  const dd=aggregate(f,r=>r.date||'Tanpa tanggal');
+  $('dayRows').innerHTML=[...dd.entries()].sort((a,b)=>b[0].localeCompare(a[0])).map(([k,a])=>`<tr><td>${fmtDate(k)}</td><td class="num">${fmt(sum(a,'close'))}</td><td class="num green">${fmt(sum(a,'setor'))}</td><td class="num">${sel(sum(a,'close')-sum(a,'setor'))}</td><td class="num">${fmtNum(a.length)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Tidak ada data</td></tr>';
+  $('reportStores').textContent=fmtNum(sm.size);$('reportDays').textContent=fmtNum(dd.size);$('reportSetor').textContent=fmt(setor);$('reportClose').textContent=fmt(close);
+}
+
+// Tanggal dari Apps Script bisa berupa 'YYYY-MM-DD' atau ISO UTC ('2026-11-02T17:00:00.000Z' = 3 Nov WIB).
+// ISO harus diubah ke tanggal LOKAL, jangan dipotong begitu saja (bisa mundur 1 hari).
+function tglLokal(v){
+  var s=String(v||'').trim(); if(!s) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  var m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  var d=new Date(s); if(isNaN(+d)) return s.slice(0,10);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function hariIni(){ return tglLokal(new Date().toISOString()); }
+function pasangData(d){
+  DATA = d; rows = (d.rows||[]).map((r,i)=>({...r,_i:i}));
+  initFilters(); update(); freshInfoTeks();
+}
+var sedangMuat = false;
+function muatData(force){
+  var btn = $('btnFresh');
+  // 1) Tampilkan cache dulu biar cepat (kalau ada), TAPI tetap ambil data baru dari server.
+  if(!force && !DATA){
+    try{
+      var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if(c && c._ts && Array.isArray(c.rows) && (Date.now() - c._ts) < CACHE_MIN*60000) pasangData(c);
+    }catch(e){}
+  }
+  if(sedangMuat) return; sedangMuat = true;
+  if(btn) btn.textContent = '⟳ Memuat…';
+  // 2) Cache-buster (?t=) supaya browser/proxy tidak memberi respons lama.
+  fetch(API + (API.indexOf('?')>-1?'&':'?') + 't=' + Date.now(), {method:'GET', redirect:'follow', cache:'no-store'})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d && d.error) throw new Error(d.error);
+      if(!d || !Array.isArray(d.rows)) throw new Error('format');
+      d.rows = d.rows.map(function(r){ return Object.assign({}, r, {date: tglLokal(r.date), nominal: Number(String(r.nominal).replace(/[^\d.-]/g,''))||0}); });
+      d._ts = Date.now();
+      try{ localStorage.setItem(CACHE_KEY, JSON.stringify(d)); }catch(e){}
+      pasangData(d);
+      $('btnFresh').textContent = '⟳ Muat ulang data';
+    })
+    .catch(function(err){
+      $('btnFresh').textContent = '⟳ Gagal! Coba lagi';
+      $('freshInfo').textContent = 'Gagal muat data — ' + (err && err.message && err.message!=='Failed to fetch' ? err.message : 'cek koneksi');
+    })
+    .finally(function(){ sedangMuat = false; });
+}
+
+// Rentang tanggal otomatis ikut data terbaru, kecuali user sudah mengubah tanggal sendiri.
+var tanggalManual = false;
+function rentangOtomatis(){
+  var ds=rows.map(r=>r.date).filter(Boolean).sort();
+  var akhir = ds[ds.length-1]||''; var hi = hariIni();
+  $('from').value = ds[0]||'';
+  $('to').value = akhir && akhir > hi ? akhir : hi;
+}
+function initFilters(){
+  var stores=[...new Set([...(DATA.kdkmpList||[]),...(DATA.operationalKdkmp||[]),...rows.map(r=>r.kdkmp)].filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  var sel=$('store');
+  var sekarang = sel.value || '';
+  sel.innerHTML='<option value="">Semua toko</option>'+stores.map(s=>`<option value="${safe(s)}">${safe(storeDisplay(s))}</option>`).join('');
+  if(sekarang) sel.value = sekarang;
+  if(!tanggalManual) rentangOtomatis();
+}
+
+function csvDownload(name,headers,data){
+  const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const content='\ufeff'+[headers,...data].map(row=>row.map(quote).join(',')).join('\r\n');
+  const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+// ---- PIN ----
+function cekPin(){
+  if(sessionStorage.getItem('omset_buka')==='1'){ buka(); return; }
+  $('lock').style.display='block';
+  $('btnBuka').addEventListener('click', function(){
+    if($('pin').value===PIN){ sessionStorage.setItem('omset_buka','1'); buka(); }
+    else { $('peringatan').textContent='PIN salah'; $('pin').value=''; $('pin').focus(); }
+  });
+  $('pin').addEventListener('keydown', function(e){ if(e.key==='Enter') $('btnBuka').click(); });
+  $('pin').focus();
+}
+function buka(){
+  $('lock').style.display='none';
+  $('app').style.display='block';
+  muatData(false);
+}
+
+$('apply').addEventListener('click',update);
+['from','to','store','status','search'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',update));
+$('reset').addEventListener('click',()=>{$('store').value='';$('status').value='';$('search').value='';tanggalManual=false;rentangOtomatis();update()});
+['from','to'].forEach(id=>$(id).addEventListener('change',()=>{tanggalManual=true}));
+setInterval(function(){ if(DATA && !document.hidden) muatData(false); }, AUTO_REFRESH_MIN*60000);
+document.addEventListener('visibilitychange',function(){ if(!document.hidden && DATA && Date.now()-DATA._ts > 60000) muatData(false); });
+setInterval(freshInfoTeks, 30000);
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.tab-content').forEach(x=>x.classList.toggle('section-hidden',x.id!==b.dataset.tab))}));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>document.querySelector(`[data-tab="${b.dataset.goto}"]`).click()));
+$('btnFresh').addEventListener('click',()=>muatData(true));
+$('exportTransactions').addEventListener('click',()=>{let f=getFiltered();csvDownload('transaksi-omset.csv',['Tanggal','Nama Toko','Status','Nominal','Bukti'],f.map(r=>[r.date,storeDisplay(r.kdkmp),typeLabel(r),r.nominal,r.bukti||'']))});
+$('exportStores').addEventListener('click',()=>{let f=getFiltered(),m=aggregate(f,r=>r.kdkmp||'Tanpa nama');csvDownload('rekap-toko.csv',['Nama Toko','Total Close Shift','Total Setor Omset','Selisih'],[...m.entries()].map(([n,a])=>[storeDisplay(n),sum(a,'close'),sum(a,'setor'),sum(a,'close')-sum(a,'setor')]))});
+$('exportMonths').addEventListener('click',()=>{let f=getFiltered(),m=aggregate(f,r=>(r.date||'Tanpa tanggal').slice(0,7));csvDownload('laporan-bulanan.csv',['Bulan','Total Close Shift','Total Setor Omset','Selisih','Jumlah Catatan'],[...m.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([k,a])=>[k,sum(a,'close'),sum(a,'setor'),sum(a,'close')-sum(a,'setor'),a.length]))});
+cekPin();
+})();
+</script>
+</body></html>
