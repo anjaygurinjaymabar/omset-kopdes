@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📡 Pengunjung Dashboard</title>
+<style>
+:root{--bg:#0b0e13;--card:#151921;--card2:#1a1f29;--line:#252b36;--fg:#e6e9ee;--mut:#7a8494;--ok:#3ddc97;--w:#ffb454;--red:#ff5c5c;--blue:#4a9eff;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:13px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:16px;max-width:1100px;margin:0 auto}
+h1{font-size:18px;font-weight:700;margin-bottom:2px}
+.sub{color:var(--mut);font-size:12px;margin-bottom:16px}
+
+/* stats cards */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat-num{font-size:24px;font-weight:800}
+.stat-lbl{font-size:11px;color:var(--mut);margin-top:2px}
+.stat-ok .stat-num{color:var(--ok)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-w .stat-num{color:var(--w)}
+
+/* filter bar */
+.bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.btn{background:var(--card);border:1px solid var(--line);color:var(--mut);padding:5px 14px;border-radius:8px;cursor:pointer;font-size:12px;transition:.15s}
+.btn:hover{background:var(--card2);color:var(--fg)}
+.btn-on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* table */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--mut);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--card);z-index:1}
+td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:hover td{background:rgba(74,158,255,.04)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+.nowrap{white-space:nowrap}
+.ellipsis{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* badges */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600}
+.b-android{background:rgba(61,220,151,.13);color:var(--ok)}
+.b-ios{background:rgba(167,139,250,.13);color:var(--purple)}
+.b-windows{background:rgba(74,158,255,.13);color:var(--blue)}
+.b-mac{background:rgba(255,180,84,.13);color:var(--w)}
+.b-unknown{background:rgba(255,255,255,.06);color:var(--mut)}
+.b-new{background:rgba(61,220,151,.15);color:var(--ok);font-size:9.5px;margin-left:4px}
+
+/* device icon */
+.dicon{font-size:15px;margin-right:4px;vertical-align:-1px}
+
+/* footer */
+.foot{color:var(--mut);font-size:11px;text-align:center;margin-top:14px}
+.foot .dot{color:var(--ok)}
+
+/* empty */
+.empty{padding:30px;text-align:center;color:var(--mut)}
+
+/* responsive */
+@media(max-width:640px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .ellipsis{max-width:80px}
+}
+</style>
+</head>
+<body>
+
+<h1>📡 Pengunjung Dashboard</h1>
+<div class="sub">Data dari Sheet <i>Log Kunjungan Kopdes</i> · Auto-refresh tiap 2 menit</div>
+
+<!-- stats cards -->
+<div class="stats-row">
+  <div class="stat stat-ok">
+    <div class="stat-num" id="sTotal">—</div>
+    <div class="stat-lbl">Total Kunjungan</div>
+  </div>
+  <div class="stat stat-blue">
+    <div class="stat-num" id="sUnik">—</div>
+    <div class="stat-lbl">Perangkat Unik</div>
+  </div>
+  <div class="stat stat-w">
+    <div class="stat-num" id="sHari">—</div>
+    <div class="stat-lbl">Hari Ini</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" id="sKota">—</div>
+    <div class="stat-lbl">Kota Berbeda</div>
+  </div>
+</div>
+
+<!-- filter bar -->
+<div class="bar">
+  <div class="filters">
+    <button class="btn btn-on" id="f-all" onclick="setFilter('all')">Semua</button>
+    <button class="btn" id="f-unique" onclick="setFilter('unique')">Unik</button>
+    <button class="btn" id="f-today" onclick="setFilter('today')">Hari Ini</button>
+    <button class="btn" id="f-7d" onclick="setFilter('7d')">7 Hari</button>
+  </div>
+  <button class="btn" onclick="muat()" id="btnRef">↻ Refresh</button>
+</div>
+
+<!-- table -->
+<div class="tbl-wrap">
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th>Waktu</th>
+        <th>Perangkat</th>
+        <th>OS</th>
+        <th>Browser</th>
+        <th>Layar</th>
+        <th>RAM</th>
+        <th>Kota</th>
+        <th>ISP</th>
+        <th>IP</th>
+      </tr>
+    </thead>
+    <tbody id="body"><tr><td colspan="9" class="empty">Memuat…</td></tr></tbody>
+  </table>
+</div>
+
+<div class="foot"><span class="dot">●</span> Data dari Sheet lu sendiri · Gak ada yang bisa lihat ini kecuali lu</div>
+
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbwntTOkHdFYHer1HLKBZenR54qqbq3N_uEQpEBJE-_zAzPvQYyhPG_dOLl_MQVhKAVV/exec';
+var DATA = [];
+var filter = 'all';
+
+/* ===== data contoh (5 perangkat — nanti diganti data asli dari Apps Script) ===== */
+var CONTOH = [
+  {Waktu:"2026-11-18T14:02:00",Model:"SM-A525F",Merek:"Samsung",OS:"Android",OS_Versi:"13",Browser:"Chrome",Browser_Versi:"145.0.7632",Layar:"412×915",DPR:"2.625",RAM:"4",Sentuh:"ya",Kota:"Bandung",Wilayah:"Jawa Barat",Negara:"ID",ISP:"PT Telkom Indonesia",IP:"114.122.15.33",Sidik:"17817b43"},
+  {Waktu:"2026-11-18T14:05:23",Model:"SM-S911B",Merek:"Samsung",OS:"Android",OS_Versi:"14",Browser:"Chrome",Browser_Versi:"145.0.7632",Layar:"360×780",DPR:"3",RAM:"8",Sentuh:"ya",Kota:"Cimahi",Wilayah:"Jawa Barat",Negara:"ID",ISP:"XL Axiata",IP:"180.242.12.88",Sidik:"e8c17d3b"},
+  {Waktu:"2026-11-18T14:12:45",Model:"iPhone 12/13/14",Merek:"Apple",OS:"iOS",OS_Versi:"17.5",Browser:"Safari",Browser_Versi:"17.5",Layar:"390×844",DPR:"3",RAM:"",Sentuh:"ya",Kota:"Jakarta",Wilayah:"DKI Jakarta",Negara:"ID",ISP:"Indosat Ooredoo",IP:"140.213.45.12",Sidik:"a04a2531"},
+  {Waktu:"2026-11-18T15:01:10",Model:"SM-A525F",Merek:"Samsung",OS:"Android",OS_Versi:"13",Browser:"Chrome",Browser_Versi:"145.0.7632",Layar:"412×915",DPR:"2.625",RAM:"4",Sentuh:"ya",Kota:"Bandung",Wilayah:"Jawa Barat",Negara:"ID",ISP:"PT Telkom Indonesia",IP:"114.122.15.33",Sidik:"17817b43"},
+  {Waktu:"2026-11-19T08:22:33",Model:"V2350",Merek:"Vivo",OS:"Android",OS_Versi:"14",Browser:"Chrome",Browser_Versi:"144.0.0.0",Layar:"360×800",DPR:"2",RAM:"3",Sentuh:"ya",Kota:"Bandung",Wilayah:"Jawa Barat",Negara:"ID",ISP:"Telkomsel",IP:"36.80.112.45",Sidik:"fb1122aa"},
+];
+DATA = CONTOH;
+
+/* ===== format waktu ===== */
+function fmtJam(iso){
+  if(!iso) return "-";
+  var d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+}
+function fmtTanggal(iso){
+  if(!iso) return "-";
+  var d = new Date(iso);
+  if(isNaN(d)) return iso;
+  var bln = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  return d.getDate() + " " + bln[d.getMonth()] + " " + d.getFullYear();
+}
+
+/* ===== os badge ===== */
+function osBadge(os){
+  os = (os||"").toLowerCase();
+  if(os==="android") return '<span class="badge b-android">🤖 Android</span>';
+  if(os==="ios"||os==="ipados") return '<span class="badge b-ios">🍎 iOS</span>';
+  if(os==="windows") return '<span class="badge b-windows">🪟 Windows</span>';
+  if(os==="macos") return '<span class="badge b-mac">💻 macOS</span>';
+  if(os==="linux") return '<span class="badge b-unknown">🐧 Linux</span>';
+  return '<span class="badge b-unknown">'+esc(os||"-")+'</span>';
+}
+
+function deviceIcon(os){
+  os=(os||"").toLowerCase();
+  if(os==="android"||os==="ios"||os==="ipados") return "📱";
+  return "💻";
+}
+
+function esc(s){
+  if(s===null||s===undefined||s==="") return "-";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ===== filter ===== */
+function setFilter(f){
+  filter = f;
+  ["all","unique","today","7d"].forEach(function(k){
+    var el = document.getElementById("f-"+k);
+    if(el) el.classList.toggle("btn-on", k===f);
+  });
+  render();
+}
+
+/* ===== render ===== */
+function updateStats(rows){
+  var now = new Date();
+  var today = now.toISOString().slice(0,10);
+  var unik = {};
+  var kota = {};
+  rows.forEach(function(r){
+    unik[r.Sidik||r.sidik||""] = 1;
+    kota[r.Kota||r.kota||"-"] = 1;
+  });
+  document.getElementById("sTotal").textContent = rows.length;
+  document.getElementById("sUnik").textContent = Object.keys(unik).length;
+  document.getElementById("sHari").textContent = rows.filter(function(r){
+    return (r.Waktu||"").slice(0,10) === today;
+  }).length;
+  document.getElementById("sKota").textContent = Object.keys(kota).length;
+}
+
+function render(){
+  var rows = DATA.slice().reverse(); // terbaru di atas
+  var now = new Date();
+  var today = now.toISOString().slice(0,10);
+  var weekAgo = new Date(now - 7*86400000).toISOString().slice(0,10);
+
+  if(filter === "today"){
+    rows = rows.filter(function(r){ return (r.Waktu||"").slice(0,10) === today; });
+  } else if(filter === "7d"){
+    rows = rows.filter(function(r){ return (r.Waktu||"") >= weekAgo; });
+  } else if(filter === "unique"){
+    var seen = {};
+    rows = rows.filter(function(r){
+      var k = r.Sidik || r.sidik || "";
+      if(seen[k]) return false;
+      seen[k] = true; return true;
+    });
+  }
+
+  updateStats(DATA.slice().reverse());
+  if(rows.length === 0){
+    document.getElementById("body").innerHTML = '<tr><td colspan="9" class="empty">Belum ada data untuk filter ini.</td></tr>';
+    return;
+  }
+
+  var seenSidik = {};
+  var h = "";
+  for(var i=0;i<rows.length;i++){
+    var r = rows[i];
+    var sk = r.Sidik || r.sidik || "";
+    var isNew = !seenSidik[sk];
+    seenSidik[sk] = 1;
+
+    var model = r.Model || r.model || "-";
+    var merek = r.Merek || r.merek || "";
+    if(merek && model !== "-") model = merek + " " + model;
+    else if(merek) model = merek;
+    if(!model || model==="-") model = "(tidak terbaca)";
+
+    var ram = r.RAM || r.ram || "";
+    var ramTxt = ram ? ram + " GB" : "-";
+
+    var os = r.OS || r.os || "-";
+    var osv = r.OS_Versi || r.osVer || "";
+
+    var brw = (r.Browser || r.browser || "-") + " " + (r.Browser_Versi || r.browserVer || "");
+    brw = brw.trim();
+
+    var layar = r.Layar || r.screen || "-";
+    var dpr = r.DPR || r.dpr || "";
+    if(dpr && layar !== "-") layar += " @" + dpr + "x";
+
+    h += '<tr>' +
+      '<td class="nowrap"><div style="font-weight:600">' + fmtJam(r.Waktu) + '</div>' +
+        '<div style="font-size:10.5px;color:var(--mut)">' + fmtTanggal(r.Waktu) + '</div>' +
+        (isNew ? '<span class="badge b-new">BARU</span>' : '') +
+      '</td>' +
+      '<td><span class="dicon">' + deviceIcon(os) + '</span>' + esc(model) + '</td>' +
+      '<td>' + osBadge(os) + '<div style="font-size:10px;color:var(--mut);margin-top:2px">' + esc(osv||"") + '</div></td>' +
+      '<td class="nowrap mono">' + esc(brw) + '</td>' +
+      '<td class="nowrap mono">' + esc(layar) + '</td>' +
+      '<td class="nowrap mono">' + esc(ramTxt) + '</td>' +
+      '<td>' + esc(r.Kota||r.kota||"-") + '<div style="font-size:10px;color:var(--mut)">' + esc(r.Wilayah||r.wilayah||"") + '</div></td>' +
+      '<td class="ellipsis" title="' + esc(r.ISP||r.isp||"") + '">' + esc(r.ISP||r.isp||"-") + '</td>' +
+      '<td class="nowrap mono" style="color:var(--mut)">' + esc(r.IP||r.ip||"-") + '</td>' +
+    '</tr>';
+  }
+  document.getElementById("body").innerHTML = h;
+}
+
+/* ===== load from Apps Script ===== */
+function muat(){
+  if(API.indexOf("GANTI_") === 0){
+    // mode demo — pakai data contoh
+    DATA = CONTOH;
+    render();
+    return;
+  }
+  var b = document.getElementById("body");
+  b.innerHTML = '<tr><td colspan="9" class="empty">Memuat…</td></tr>';
+  fetch(API, {cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(j){
+      DATA = j.rows || [];
+      render();
+    })
+    .catch(function(e){
+      b.innerHTML = '<tr><td colspan="9" class="empty" style="color:var(--red)">Gagal: '+e.message+'<br><small>Pastikan URL exec sudah diganti & Apps Script sudah di-deploy.</small></td></tr>';
+    });
+}
+
+/* ===== init ===== */
+muat();
+setInterval(muat, 120000); // auto-refresh 2 menit
+</script>
+</body>
+</html>
